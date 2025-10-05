@@ -33,3 +33,37 @@ token_strs = [f"T{i}" for i in token_ids[0]]
 last_layer_attn = attn[-1]  # ambil dari decoder block terakhir
 # print(last_layer_attn)
 visualize_attention(last_layer_attn, token_strs, head=0)
+
+
+print("\n=== CEK DIMENSI TENSOR ===")
+print("token_ids:", token_ids)
+print("logits.shape:", logits.shape)     # (2, 10, 64)
+print("attention shape (layer, batch, head, seq, seq):", [a.shape for a in attn])
+attn_avg = get_attention_average(attn)
+print("attn_avg shape:", attn_avg.shape)  # (batch, seq, seq)
+assert logits.shape == (batch, seq, vocab_size), "Logits shape mismatch"
+assert attn_avg.shape == (batch, seq, seq), "Attention average shape mismatch"
+
+print("=== CEK HASIL SOFTMAX ===")
+print(logits[0, -1]) 
+probs = softmax(logits[0, -1])
+print("sum probs (should be 1):", probs.sum())
+assert np.allclose(probs.sum(), 1.0, atol=1e-6), "Softmax output invalid"
+
+print("\n=== CEK MASKING (CAUSAL MASK) ===")
+seq = 10
+# boolean mask: True = masked (future), False = visible
+causal_mask = np.triu(np.ones((seq, seq), dtype=bool), k=1)
+
+print("Causal mask (1 = masked, 0 = visible):")
+print(causal_mask.astype(int))
+
+# sanity: jumlah elemen yang dimask = seq*(seq-1)/2
+expected = seq * (seq - 1) // 2
+assert np.sum(causal_mask) == expected
+print("causal mask shape OK and count OK.")
+
+print("\n=== VISUALISASI ATTENTION ===")
+token_strs = [f"T{i}" for i in token_ids[0]]
+last_layer_attn = attn[-1]  # layer terakhir
+visualize_attention(last_layer_attn, token_strs, head=0)
