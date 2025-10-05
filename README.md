@@ -14,17 +14,23 @@ NIM: 22/498140/TK/54627
 
 ## How to run
 1. Install dependencies:
+   ```
    pip install numpy
    # optional
    pip install matplotlib
-
+   ```
+   
 2. Run sanity checks:
+   ```
    cd test
    python transformer_test.py
-
-4. Run tests:
+   ```
+   
+3. Run tests:
+   ```
    cd test
    python tests.py
+   ```
 
 ## Features
 - Token embedding, positional encoding (sinusoidal / learned / RoPE)
